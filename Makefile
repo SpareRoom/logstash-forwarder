@@ -10,7 +10,7 @@ logstash-forwarder:
 	go build -o $@
 
 .PHONY: clean
-clean: 
+clean:
 	-rm $(OBJECTS)
 	-rm -rf build
 
@@ -18,9 +18,8 @@ clean:
 generate-init-script:
 	pleaserun --install --no-install-actions --install-prefix ./build \
 		--chdir /var/lib/logstash-forwarder \
-		--sysv-log-path /var/log/logstash-forwarder/ \
-		--overwrite -p sysv -v lsb-3.1 $(PREFIX)/bin/logstash-forwarder -config /etc/logstash-forwarder.conf
- 
+		--overwrite -p systemd -v lsb-3.1 $(PREFIX)/bin/logstash-forwarder -config /etc/logstash-forwarder.conf
+
 build/empty: | build
 	mkdir $@
 

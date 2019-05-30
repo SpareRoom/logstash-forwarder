@@ -14,13 +14,13 @@ import (
 	"net"
 	"os"
 	"regexp"
-	"strconv"
 	"time"
-)
 
-// Support for newer SSL signature algorithms
-import _ "crypto/sha256"
-import _ "crypto/sha512"
+	// Support for newer SSL signature algorithms
+	_ "crypto/sha256"
+
+	_ "crypto/sha512"
+)
 
 var hostname string
 var hostport_re, _ = regexp.Compile("^(.+):([0-9]+)$")
@@ -136,7 +136,7 @@ func connect(config *NetworkConfig) (socket *tls.Conn) {
 			config.SSLCertificate, config.SSLKey)
 		cert, err := tls.LoadX509KeyPair(config.SSLCertificate, config.SSLKey)
 		if err != nil {
-			fault ("Failed loading client ssl certificate: %s\n", err)
+			fault("Failed loading client ssl certificate: %s\n", err)
 		}
 		tlsconfig.Certificates = []tls.Certificate{cert}
 	}
@@ -228,11 +228,12 @@ func writeDataFrame(event *FileEvent, sequence uint32, output io.Writer) {
 	// sequence number
 	binary.Write(output, binary.BigEndian, uint32(sequence))
 	// 'pair' count
-	binary.Write(output, binary.BigEndian, uint32(len(*event.Fields)+4))
+	binary.Write(output, binary.BigEndian, uint32(len(*event.Fields)+2))
 
-	writeKV("file", *event.Source, output)
+	// omit some of these fields which have no use to us
+	//writeKV("file", *event.Source, output)
 	writeKV("host", hostname, output)
-	writeKV("offset", strconv.FormatInt(event.Offset, 10), output)
+	//writeKV("offset", strconv.FormatInt(event.Offset, 10), output)
 	writeKV("line", *event.Text, output)
 	for k, v := range *event.Fields {
 		writeKV(k, v, output)
